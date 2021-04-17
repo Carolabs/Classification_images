@@ -67,8 +67,8 @@ def estudio_hiperparametros(X1D, X3D, Y, scoresLR, scoresLDA, scoresKNN, scoresD
     batch_size = 20
     lr = 0.001
 
-    array_conNeurons = np.array([[64, 128, 128], [64, 64, 128, 128]])
-    array_denseNeurons = np.array([[128, 4], [256, 128, 4]])
+    array_conNeurons = np.array([[8, 16, 16], [64, 128, 128], [8, 8, 16, 16], [64, 64, 128, 128]])
+    array_denseNeurons = np.array([[64, 4]])
     newModelsDL = dict()
     newScoresDL = dict()
 

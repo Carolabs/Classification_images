@@ -10,15 +10,14 @@ from statsmodels.stats.multicomp import pairwise_tukeyhsd, MultiComparison
 def contraste(accuracyLR, accuracyLDA, accuracyKNN, accuracyDL, alpha):
     # Los vectores para comparar tienen que tener el mismo tamaño, así que cogemos el mínimo de los dos valores
     vals = min(len(accuracyLR),len(accuracyLDA),len(accuracyKNN),len(accuracyDL))
-    print(vals)
-    F_statistic, pVal = stats.kruskal(accuracyLR[0:vals], accuracyLDA[0:vals], accuracyKNN[0:vals], accuracyDL[1:vals + 1])
-    F_statistic2, pVal2 = stats.f_oneway(accuracyLR[0:vals], accuracyLDA[0:vals], accuracyKNN[0:vals], accuracyDL[1:vals + 1])
+    F_statistic, pVal = stats.kruskal(accuracyLR[0:vals], accuracyLDA[0:vals], accuracyKNN[0:vals], accuracyDL[0:vals])
+    F_statistic2, pVal2 = stats.f_oneway(accuracyLR[0:vals], accuracyLDA[0:vals], accuracyKNN[0:vals], accuracyDL[0:vals])
     print ('p-valor KrusW:', pVal)
     print ('p-valor ANOVA:', pVal2)
 
     if pVal <= alpha:
         print('Rechazamos la hipótesis: los modelos son diferentes\n')
-        stacked_data = np.vstack((accuracyLR[0:vals], accuracyLDA[0:vals], accuracyKNN[0:vals], accuracyDL[1:vals + 1])).ravel()
+        stacked_data = np.vstack((accuracyLR[0:vals], accuracyLDA[0:vals], accuracyKNN[0:vals], accuracyDL[0:vals])).ravel()
         stacked_model = np.vstack((np.repeat('modelLR',vals),np.repeat('modelLDA',vals),np.repeat('modelKNN',vals), np.repeat('modelDL', vals))).ravel()    
         MultiComp = MultiComparison(stacked_data, stacked_model)
         comp = MultiComp.allpairtest(stats.ttest_rel, method='Holm')

@@ -27,7 +27,6 @@ maxIte = 100000 # Número máximo de iteraciones
 scoring = ['accuracy','roc_auc_ovo','f1_macro', 'precision_macro', 'recall_macro']
 scoresLR, scoresLDA, scoresKNN = entrenar_regresiones(X_1D_norm, t_num, CV, neighbours, maxIte, scoring)
 
-
 # Entrenamiento de la red convolucional
 print("Iniciando entrenamiento red convolucional con keras")
 k_folds = 5
@@ -38,7 +37,7 @@ lr = 0.001
 metrics = ['accuracy','AUC','Recall','Precision', f1_score]
 conNeurons = [32, 64, 64]
 denseNeurons = [64, 4]
-scoresDL = entrena_redconv(X_3Dnorm, t_num, conNeurons, denseNeurons, lr, k_folds, k_fold_reps, batch_size, epochs, metrics)
+scoresDL = entrena_redconv(X_3Dnorm, t_num, conNeurons, denseNeurons, lr, k_folds, k_fold_reps, batch_size, epochs, metrics, 64)
 
 # Se realiza las comparativas de los principales parametros de las tecnicas evaluadas
 comparativa_tecnicas(scoresLR, scoresLDA, scoresKNN, scoresDL)

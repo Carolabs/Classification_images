@@ -93,9 +93,9 @@ def f1_score(y_true, y_pred):
     recall = recall(y_true, y_pred)
     return 2*((precision*recall)/(precision+recall+K.epsilon()))
 
-def entrena_redconv(X, Y, conNeurons, denseNeurons, lr, k_folds, k_fold_reps, batch_size, epochs, metrics):
+def entrena_redconv(X, Y, conNeurons, denseNeurons, lr, k_folds, k_fold_reps, batch_size, epochs, metrics, resolucion):
 
-    scoresDL = conv(X, Y, conNeurons, denseNeurons, lr, k_folds, k_fold_reps, batch_size, epochs, metrics)
+    scoresDL = conv(X, Y, conNeurons, denseNeurons, lr, k_folds, k_fold_reps, batch_size, epochs, metrics, resolucion)
 
     # Rename columns of the dataframe
     scoresDL.columns = ['Accuracy','AUC','Recall','Precision', 'F1']
