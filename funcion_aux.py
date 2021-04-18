@@ -82,7 +82,6 @@ def saveHyperparametersScenarios(scores, newScores, file, headers):
         newScores_df = pd.DataFrame()
         for element in headers:
             newScores_df[element] = value[element]
-            print(value[element])
             
 
         newScores_df.to_excel(writer, key, engine='xlsxwriter', columns=headers)

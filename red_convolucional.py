@@ -10,7 +10,7 @@ from sklearn.model_selection import RepeatedStratifiedKFold, train_test_split
 
 def conv(X, Y, conNeurons, denseNeurons, lr, k_folds, k_fold_reps, batch, epochs, metrics, resolucion):
     
-    models = [] # Array con modelos
+    models = [] # Guarda los modelos que se van generar
     n_classes =  len(np.unique(Y))
     results = pd.DataFrame(columns=metrics)  
 
@@ -25,7 +25,7 @@ def conv(X, Y, conNeurons, denseNeurons, lr, k_folds, k_fold_reps, batch, epochs
             modelDL.add(layers.Conv2D(conNeurons[i], (3, 3), activation='relu'))
             modelDL.add(layers.MaxPooling2D((2, 2)))
 
-        modelDL.add(layers.Conv2D(conNeurons[len(conNeurons) - 1], (3, 3), activation='relu')) # La última capa convolucional
+        modelDL.add(layers.Conv2D(conNeurons[len(conNeurons) - 1], (3, 3), activation='relu')) # La última es así
 
         # Capa intermedia
         modelDL.add(layers.Flatten())
@@ -36,7 +36,7 @@ def conv(X, Y, conNeurons, denseNeurons, lr, k_folds, k_fold_reps, batch, epochs
 
         modelDL.add(layers.Dense(denseNeurons[len(denseNeurons) - 1], activation='softmax')) # La última capa tiene que ser así
 
-        # Compila la red, conecta todas las neuronas y saca la tabla resumen 
+        # Compilar
         modelDL.compile(loss='categorical_crossentropy', optimizer=keras.optimizers.Adam(learning_rate=lr), metrics=metrics)  
         modelDL.summary()
         return modelDL

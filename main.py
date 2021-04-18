@@ -1,5 +1,5 @@
 from entrada_salida import normalizar_entradas
-from cargar_imagen import cargar_imagenes 
+from cargar_imagen import cargar_imagenes, create_folder 
 from datos_csv import cargar_csv
 from entrada_salida import normalizar_entradas
 from regresiones import entrenar_regresiones
@@ -7,6 +7,9 @@ from red_convolucional import entrena_redconv, f1_score
 from comparativa import comparativa_tecnicas
 from hiperparametros import estudio_hiperparametros 
 from contraste_hipotesis import contraste
+
+# Crear directorio
+create_folder('dataset/Data_Images64x64')
 
 # Carga las imagenes y las redimensiona a 64x64
 print('Comenzando preprocesado de imagenes.....')
@@ -31,7 +34,7 @@ scoresLR, scoresLDA, scoresKNN = entrenar_regresiones(X_1D_norm, t_num, CV, neig
 print("Iniciando entrenamiento red convolucional con keras")
 k_folds = 5
 k_fold_reps = 1 
-epochs = 25
+epochs = 5
 batch_size = 20
 ler = 0.001
 metrics = ['accuracy','AUC','Recall','Precision', f1_score]
@@ -48,5 +51,3 @@ contraste(scoresLR['test_accuracy'], scoresLDA['test_accuracy'], scoresKNN['test
 
 #Se realiza el estudio de hiperparametros y se exportan a excel
 estudio_hiperparametros(X_1D_norm, X_3Dnorm, t_num, scoresLR, scoresLDA, scoresKNN, scoresDL, maxIte,scoring, metrics, 64)
-
-

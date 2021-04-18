@@ -7,7 +7,7 @@ from red_convolucional import f1_score, conv
 def estudio_hiperparametros(X1D, X3D, Y, scoresLR, scoresLDA, scoresKNN, scoresDL, maxIte,scoring_regresiones, metricas_conv, resolucion):
     #Modificar hiperparámetros para LR
     print("Inicio de estudio hiperparametros LR")
-    array_CV = np.arange(2, 5, 1)
+    array_CV = np.arange(2, 3, 1)
 
     newModelsLR = dict()
     newScoresLR = dict()
@@ -25,7 +25,7 @@ def estudio_hiperparametros(X1D, X3D, Y, scoresLR, scoresLDA, scoresKNN, scoresD
 
     # Modificar hiperparámetros para LDA
     print("Inicio de estudio hiperparametros LDA")
-    array_CV = np.arange(2, 5, 1)
+    array_CV = np.arange(2, 3, 1)
     newModelsLDA = dict()
     newScoresLDA = dict()
 
@@ -67,9 +67,8 @@ def estudio_hiperparametros(X1D, X3D, Y, scoresLR, scoresLDA, scoresKNN, scoresD
     batch_size = 20
     ler = 0.001
 
-    array_conNeurons = np.array([[8, 16, 16], [8, 8, 16, 16]])
-    array_denseNeurons = np.array([[64, 4]])
-    #newModelsDL = dict()
+    array_conNeurons = np.array([[8, 16, 16], [8, 8, 16, 16], [16, 64, 64], [16, 16, 64, 64]])
+    array_denseNeurons = np.array([[32, 4], [64, 4], [128, 64, 4]])
     newScoresDL = dict()
 
 
@@ -80,7 +79,7 @@ def estudio_hiperparametros(X1D, X3D, Y, scoresLR, scoresLDA, scoresKNN, scoresD
             # Nombre
             scenario = str('Conv_' + str(i * len(array_denseNeurons) + j))
             
-            newScoresDL[scenario] = conv(X3D, Y, array_conNeurons[i], array_denseNeurons, ler, k_folds, k_fold_reps, batch_size, epochs, metricas_conv, resolucion)
+            newScoresDL[scenario] = conv(X3D, Y, array_conNeurons[i], array_denseNeurons[j], ler, k_folds, k_fold_reps, batch_size, epochs, metricas_conv, resolucion)
             newScoresDL[scenario].columns = ['Accuracy','AUC','Recall','Precision', 'F1']
 
     # Imprime figuras

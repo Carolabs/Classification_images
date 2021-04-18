@@ -80,3 +80,11 @@ def cargar_imagenes(origen, destino, resolucion):
     # Comprobamos las diferencias entre la imagen original y la redimensionada.
     Plot_Imagenes("Calidad 100% \n",L_nameDataImag,L_RGBData,5)
     Plot_Imagenes("Redimensionadas \n",L_nameDataImag,L_RGBData_final,5)
+
+def create_folder(path):
+    try:
+        os.mkdir(path)
+    except OSError:
+        print("La creación del directorio %s falló o ya existe" % path)
+    else:
+        print("Se ha creado el directorio: %s " % path)
