@@ -7,7 +7,7 @@ from red_convolucional import f1_score, conv
 def estudio_hiperparametros(X1D, X3D, Y, scoresLR, scoresLDA, scoresKNN, scoresDL, maxIte,scoring_regresiones, metricas_conv, resolucion):
     #Modificar hiperparámetros para LR
     print("Inicio de estudio hiperparametros LR")
-    array_CV = np.arange(2, 3, 1)
+    array_CV = np.arange(2, 5, 1)
 
     newModelsLR = dict()
     newScoresLR = dict()
@@ -25,7 +25,7 @@ def estudio_hiperparametros(X1D, X3D, Y, scoresLR, scoresLDA, scoresKNN, scoresD
 
     # Modificar hiperparámetros para LDA
     print("Inicio de estudio hiperparametros LDA")
-    array_CV = np.arange(2, 3, 1)
+    array_CV = np.arange(2, 5, 1)
     newModelsLDA = dict()
     newScoresLDA = dict()
 
@@ -43,7 +43,7 @@ def estudio_hiperparametros(X1D, X3D, Y, scoresLR, scoresLDA, scoresKNN, scoresD
     # Modificar hiperparámetros para KNN
     print("Inicio de estudio hiperparametros KNN")
     array_CV = np.arange(2, 6, 1)
-    array_neighbours = np.arange(25, 128, 25)#########
+    array_neighbours = np.arange(25, 201, 25)
     newModelsKNN = dict()
     newScoresKNN = dict()
 
