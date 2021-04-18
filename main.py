@@ -33,21 +33,20 @@ k_folds = 5
 k_fold_reps = 1 
 epochs = 25
 batch_size = 20
-lr = 0.001
+ler = 0.001
 metrics = ['accuracy','AUC','Recall','Precision', f1_score]
 conNeurons = [32, 64, 64]
 denseNeurons = [64, 4]
-scoresDL = entrena_redconv(X_3Dnorm, t_num, conNeurons, denseNeurons, lr, k_folds, k_fold_reps, batch_size, epochs, metrics, 64)
+scoresDL = entrena_redconv(X_3Dnorm, t_num, conNeurons, denseNeurons, ler, k_folds, k_fold_reps, batch_size, epochs, metrics, 64)
 
 # Se realiza las comparativas de los principales parametros de las tecnicas evaluadas
 comparativa_tecnicas(scoresLR, scoresLDA, scoresKNN, scoresDL)
-
-#Se realiza el estudio de hiperparametros y se exportan a excel
-estudio_hiperparametros(X_1D_norm, X_3Dnorm, t_num, scoresLR, scoresLDA, scoresKNN, scoresDL, maxIte,scoring, metrics)
 
 # Se realiza el contraste de hipotesis de los valores originales
 alpha = 0.001
 contraste(scoresLR['test_accuracy'], scoresLDA['test_accuracy'], scoresKNN['test_accuracy'], scoresDL['Accuracy'], alpha)
 
+#Se realiza el estudio de hiperparametros y se exportan a excel
+estudio_hiperparametros(X_1D_norm, X_3Dnorm, t_num, scoresLR, scoresLDA, scoresKNN, scoresDL, maxIte,scoring, metrics, 64)
 
 

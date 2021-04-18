@@ -4,8 +4,8 @@ from regresiones import lr, lda, knn
 from red_convolucional import f1_score, conv
 
 # Estudio de los Hiperparámetros
-def estudio_hiperparametros(X1D, X3D, Y, scoresLR, scoresLDA, scoresKNN, scoresDL, maxIte,scoring_regresiones, metricas_conv):
-    # Modificar hiperparámetros para LR
+def estudio_hiperparametros(X1D, X3D, Y, scoresLR, scoresLDA, scoresKNN, scoresDL, maxIte,scoring_regresiones, metricas_conv, resolucion):
+    #Modificar hiperparámetros para LR
     print("Inicio de estudio hiperparametros LR")
     array_CV = np.arange(2, 5, 1)
 
@@ -43,7 +43,7 @@ def estudio_hiperparametros(X1D, X3D, Y, scoresLR, scoresLDA, scoresKNN, scoresD
     # Modificar hiperparámetros para KNN
     print("Inicio de estudio hiperparametros KNN")
     array_CV = np.arange(2, 6, 1)
-    array_neighbours = np.arange(25, 201, 25)
+    array_neighbours = np.arange(25, 128, 25)#########
     newModelsKNN = dict()
     newScoresKNN = dict()
 
@@ -65,11 +65,11 @@ def estudio_hiperparametros(X1D, X3D, Y, scoresLR, scoresLDA, scoresKNN, scoresD
     k_fold_reps = 1 
     epochs = 25
     batch_size = 20
-    lr = 0.001
+    ler = 0.001
 
-    array_conNeurons = np.array([[8, 16, 16], [64, 128, 128], [8, 8, 16, 16], [64, 64, 128, 128]])
+    array_conNeurons = np.array([[8, 16, 16], [8, 8, 16, 16]])
     array_denseNeurons = np.array([[64, 4]])
-    newModelsDL = dict()
+    #newModelsDL = dict()
     newScoresDL = dict()
 
 
@@ -80,7 +80,7 @@ def estudio_hiperparametros(X1D, X3D, Y, scoresLR, scoresLDA, scoresKNN, scoresD
             # Nombre
             scenario = str('Conv_' + str(i * len(array_denseNeurons) + j))
             
-            newScoresDL[scenario] = conv(X3D, Y, array_conNeurons[i], array_denseNeurons, lr, k_folds, k_fold_reps, batch_size, epochs, metricas_conv)
+            newScoresDL[scenario] = conv(X3D, Y, array_conNeurons[i], array_denseNeurons, ler, k_folds, k_fold_reps, batch_size, epochs, metricas_conv, resolucion)
             newScoresDL[scenario].columns = ['Accuracy','AUC','Recall','Precision', 'F1']
 
     # Imprime figuras
