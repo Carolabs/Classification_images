@@ -1,7 +1,7 @@
 from entrada_salida import normalizar_entradas
 from cargar_imagen import cargar_imagenes, create_folder 
 from datos_csv import cargar_csv
-from tecnicas import lr, knn, rf, conv, pca
+from tecnicas import lr, knn, rf, conv, pca, km
 from funcion_aux import cajas, saveToExcel
 from sklearn import metrics
 import numpy as np
@@ -26,12 +26,26 @@ X_1D_norm, X_3Dnorm = normalizar_entradas(dato_entrada)
 
 # Reduccion de la dimensionalidad para entrenar las regresiones del sklearn
 # Se pasan de 12288 elementos a 50
-n_components = 500
+print("Iniciando reduccion de la dimensionalidad con PCA")
+n_components = 50
 PCA, X_1D_reduced = pca(X = X_1D_norm, n_components = n_components)
 plt.bar(np.arange(1, len(PCA.explained_variance_ratio_) + 1), PCA.explained_variance_ratio_ * 100)
 plt.show(block=True)
 
-# Clusterizacion
+# Clusterizacion mediante el uso de k-medias
+print("Iniciando clusterizacion con k-medias")
+n_clusters = 10
+inercias = []
+
+for n_cluster in range(1, n_clusters + 1):
+    print('Con', n_cluster,'clusters')
+    kmeans = km(X = X_1D_norm, clusters = n_cluster)
+    inercias.append(kmeans.inertia_)
+
+_ = plt.plot(np.arange(1, len(inercias) + 1), inercias)
+plt.ylabel("Inercia")
+plt.xlabel("Clusters")
+plt.show(block=True)
 
 # Entrenamiento LR
 print("Iniciando entrenamiento LR")
@@ -44,7 +58,7 @@ for cv in CV:
     scoresLR['LR_CV' + str(cv)] = lr(X = X_1D_reduced, Y = t_num, max_Ite = maxIte, cv = cv)
 
 # Imprimir graficas
-for metric in ['accuracy','roc_auc_ovo','f1_macro', 'precision_macro', 'recall_macro']:
+for metric in ['test_accuracy','test_roc_auc_ovo','test_f1_macro', 'test_precision_macro', 'test_recall_macro']:
     cajas(scoresLR, metric, 'LR-' + str(metric))
 
 # Entrenamiento RF
@@ -59,7 +73,7 @@ for cv in CV:
         scoresRF['RF_CV' + str(cv) + '_trees' + str(tree)] = rf(X = X_1D_reduced, Y = t_num, trees = tree, cv = cv)
 
 # Imprimir graficas
-for metric in ['accuracy','roc_auc_ovo','f1_macro', 'precision_macro', 'recall_macro']:
+for metric in ['test_accuracy','test_roc_auc_ovo','test_f1_macro', 'test_precision_macro', 'test_recall_macro']:
     cajas(scoresRF, metric, 'RF-' + str(metric))
 
 # Entrenamiento KNN
@@ -74,7 +88,7 @@ for cv in CV:
         scoresKNN['KNN_CV' + str(cv) + '_neighbours' + str(neighbour)] = knn(X = X_1D_reduced, Y = t_num, neighbours = neighbour, cv = cv)
 
 # Imprimir graficas
-for metric in ['accuracy','roc_auc_ovo','f1_macro', 'precision_macro', 'recall_macro']:
+for metric in ['test_accuracy','test_roc_auc_ovo','test_f1_macro', 'test_precision_macro', 'test_recall_macro']:
     cajas(scoresKNN, metric, 'KNN-' + str(metric))
 
 # Entrenamiento Keras
@@ -83,13 +97,13 @@ CV = np.arange(start = 2, stop = 3, step = 1)
 ler = 0.001
 batch = 20 
 epochs = 5
-conNeurons = np.array([8, 16, 16], [16, 16, 16], [16, 32, 32])
-denseNeurons = np.array([32, 4], [64, 4], [128, 4])
+conNeurons = np.array([[8, 16, 16], [16, 16, 16], [16, 32, 32]])
+denseNeurons = np.array([[32, 4], [64, 4], [128, 4]])
 scoresDL = dict()
 
 for cv in CV:
     print('Con CV =', cv, ', conNeurons =', conNeurons, 'y denseNeurons =', denseNeurons)
-    scoresDL['DL_CV' + str(cv)] = conv(X = X_3Dnorm, Y = t_num, cv = cv, conNeurons = conNeurons, denseNeurons = denseNeurons, ler = ler,  batch = batch, epochs = epochs, resolucion = resolucion)
+    #scoresDL['DL_CV' + str(cv)] = conv(X = X_3Dnorm, Y = t_num, cv = cv, conNeurons = conNeurons, denseNeurons = denseNeurons, ler = ler,  batch = batch, epochs = epochs, resolucion = resolucion)
 
 # Grabar a Excel los datos obtenidos para cada tecnica y con la variacion de hiperparametros estudiada
 saveToExcel(scoresLR, 'scoresLR.xlsx')
