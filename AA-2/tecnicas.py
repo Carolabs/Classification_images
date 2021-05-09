@@ -106,33 +106,33 @@ def rf(X, Y, cv, trees):
         scoresRF.loc[k_fold + 1] = [metrics.accuracy_score(Y_test, Y_pred), 0, metrics.f1_score(Y_test, Y_pred, average='macro'), metrics.precision_score(Y_test, Y_pred, average='macro'), metrics.recall_score(Y_test, Y_pred, average='macro')]
         # Corregir el auc
 
-    return modelRF, scoresRF
+    return scoresRF
 
 def km(X, clusters):
-    modelKM = KMeans(n_clusters=clusters, random_state=0).fit(X)
+    modelKM = KMeans(n_clusters = clusters, random_state = 0).fit(X)
     return modelKM
 
 def nn(X, n_neighbours):
-    modelNN = NearestNeighbors(n_neighbors=n_neighbours).fit(X)
+    modelNN = NearestNeighbors(n_neighbors = n_neighbours).fit(X)
     return modelNN
 
 def dbscan(X, epsilon, samples):
-    modelDBSCAN = DBSCAN(eps=epsilon, min_samples=samples).fit(X)
+    modelDBSCAN = DBSCAN(eps = epsilon, min_samples = samples).fit(X)
     return modelDBSCAN
 
 def pca(X, n_components):
-    modelPCA = PCA(n_components=n_components)
+    modelPCA = PCA(n_components = n_components)
     reduced_X = modelPCA.fit_transform(X)
     return modelPCA, reduced_X
 
 def ica(X, n_components):
-    modelICA = FastICA(n_components=n_components,random_state=0)
+    modelICA = FastICA(n_components = n_components, random_state = 0)
     reduced_X = modelICA.fit_transform(X)
     return modelICA, reduced_X
 
 def conv(X, Y, cv, conNeurons, denseNeurons, ler, batch, epochs, resolucion):
     # Se divide el conjunto con k_fold estratificada
-    train_index, test_index = K_fold_estratificada(X, Y, cv, 1)
+    train_index, test_index = K_fold_estratificada(X = X, Y = Y, k_folds = cv, k_fold_reps = 1)
 
     # Se crea el score
     scoresDL = pd.DataFrame(columns=['accuracy','roc_auc_ovo','f1_macro', 'precision_macro', 'recall_macro'])
@@ -140,9 +140,9 @@ def conv(X, Y, cv, conNeurons, denseNeurons, ler, batch, epochs, resolucion):
     # Para cada set se entrena el modelo y se calculan sus scores
     for k_fold in range(0, cv):
         # Se crea el modelo
-        modelDL = crea_modelo(conNeurons, denseNeurons, ler, resolucion)
+        modelDL = crea_modelo(conNeurons = conNeurons, denseNeurons = denseNeurons, ler = ler, resolucion = resolucion)
         # Se categorizan las clases de salida
-        Y_cat = categorizar_datos(Y)
+        Y_cat = categorizar_datos(Y = Y)
         # Se obtienen los paquetes de datos de entrenamiento y test en base a los índices aleatorios generados en la k-fold
         X_train, Y_train = X[train_index[k_fold]], Y_cat[train_index[k_fold]]
         X_test, Y_test = X[test_index[k_fold]], Y_cat[test_index[k_fold]]
@@ -157,26 +157,26 @@ def crea_modelo(conNeurons, denseNeurons, ler, resolucion):
     model = keras.models.Sequential()
 
     # Crear convoluciones
-    model.add(layers.Conv2D(conNeurons[0], (3, 3), activation='relu', input_shape=(resolucion, resolucion, 3))) # La primera necesita el tamaño de entrada
+    model.add(layers.Conv2D(conNeurons[0], (3, 3), activation = 'relu', input_shape = (resolucion, resolucion, 3))) # La primera necesita el tamaño de entrada
     model.add(layers.MaxPooling2D((2, 2)))
 
     for i in range(1, len(conNeurons) - 1):
-        model.add(layers.Conv2D(conNeurons[i], (3, 3), activation='relu'))
+        model.add(layers.Conv2D(conNeurons[i], (3, 3), activation = 'relu'))
         model.add(layers.MaxPooling2D((2, 2)))
 
-    model.add(layers.Conv2D(conNeurons[len(conNeurons) - 1], (3, 3), activation='relu')) # La última es así
+    model.add(layers.Conv2D(conNeurons[len(conNeurons) - 1], (3, 3), activation = 'relu')) # La última es así
 
     # Capa intermedia
     model.add(layers.Flatten())
 
     # Crea densas
     for i in range(0, len(denseNeurons) - 1):
-        model.add(layers.Dense(denseNeurons[i], activation='relu'))
+        model.add(layers.Dense(denseNeurons[i], activation = 'relu'))
 
-    model.add(layers.Dense(denseNeurons[len(denseNeurons) - 1], activation='softmax')) # La última capa tiene que ser así
+    model.add(layers.Dense(denseNeurons[len(denseNeurons) - 1], activation = 'softmax')) # La última capa tiene que ser así
 
     # Compilar
-    model.compile(loss='categorical_crossentropy', optimizer=keras.optimizers.Adam(learning_rate=ler), metrics=['accuracy','AUC','Recall','Precision', f1_score])  
+    model.compile(loss='categorical_crossentropy', optimizer=keras.optimizers.Adam(learning_rate=ler), metrics = ['accuracy','AUC','Recall','Precision', f1_score])  
     model.summary()
 
     return model

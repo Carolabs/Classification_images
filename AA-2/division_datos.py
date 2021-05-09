@@ -13,7 +13,7 @@ def categorizar_datos(Y):
     n_classes = len(np.unique(Y))
     return keras.utils.to_categorical(Y, num_classes=n_classes)
 
-def K_fold_estratificada(X, Y, k_folds,k_fold_reps):
+def K_fold_estratificada(X, Y, k_folds, k_fold_reps):
     
     # Se genera una K-fold estratificada
     rkf = RepeatedStratifiedKFold(n_splits=k_folds, n_repeats=k_fold_reps, random_state=42)
