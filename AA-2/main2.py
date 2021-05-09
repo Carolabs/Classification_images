@@ -1,9 +1,11 @@
 from entrada_salida import normalizar_entradas
 from cargar_imagen import cargar_imagenes, create_folder 
 from datos_csv import cargar_csv
-from tecnicas import lr, knn, rf, conv
+from tecnicas import lr, knn, rf, conv, pca
+from funcion_aux import cajas
 from sklearn import metrics
 import numpy as np
+import matplotlib.pyplot as plt
 
 # Crear directorio
 create_folder('dataset/Data_Images64x64')
@@ -22,43 +24,58 @@ print("Normalizar entradas....")
 X_1D_norm, X_3Dnorm = normalizar_entradas(dato_entrada)
 
 
+# Reduccion de la dimensionalidad para entrenar las regresiones del sklearn
+# Se pasan de 12288 elementos a 50
+n_components = 50
+PCA, X_1D_reduced = pca(X_1D_norm, n_components)
+plt.bar(np.arange(1, len(PCA.explained_variance_ratio_) + 1), PCA.explained_variance_ratio_ * 100)
+plt.show(block=True)
+
+# Clusterizacion
+
 # Entrenamiento LR
 print("Iniciando entrenamiento LR")
-CV = np.arange(start=2, stop=3, step=1)
+CV = np.arange(start=2, stop=6, step=1)
 maxIte = 100000
-scoresLR = []
+scoresLR = dict()
 
 for cv in CV:
     print('Con CV =', cv)
-    #scores = lr(X = X_1D_norm, Y = t_num, max_Ite = maxIte, cv = cv)
-    #scoresLR.append(scores)
+    scoresLR['LR_CV' + str(cv)] = lr(X = X_1D_reduced, Y = t_num, max_Ite = maxIte, cv = cv)
+
+# Imprimir graficas
+for metric in ['accuracy','roc_auc_ovo','f1_macro', 'precision_macro', 'recall_macro']:
+    cajas(scoresLR, metric, 'LR-' + str(metric))
 
 # Entrenamiento RF
 print("Iniciando entrenamiento RF")
 CV = np.arange(start=2, stop=6, step=1)
-#trees = np.arange(start=25, stop=201, step=25)
-trees = 50
-modelRF = []
-scoresRF = []
+trees = np.arange(start=25, stop=201, step=25)
+scoresRF = dict()
 
 for cv in CV:
-    print('Con CV =', cv, 'y trees =', trees)
-    #scores = rf(X = X_1D_norm, Y = t_num, trees = trees, cv = cv)
-    #scoresRF.append(scores)
+    for tree in trees:
+        print('Con CV =', cv, 'y trees =', trees)
+        scoresRF['RF_CV' + str(cv) + '_trees' + str(tree)] = rf(X = X_1D_reduced, Y = t_num, trees = tree, cv = cv)
 
+# Imprimir graficas
+for metric in ['accuracy','roc_auc_ovo','f1_macro', 'precision_macro', 'recall_macro']:
+    cajas(scoresLR, metric, 'RF-' + str(metric))
 
 # Entrenamiento KNN
 print("Iniciando entrenamiento KNN")
 CV = np.arange(start=2, stop=6, step=1)
-#neighbours = np.arange(start=25, stop=201, step=25)
-neighbours = 50
-scoresKNN = []
+neighbours = np.arange(start=25, stop=201, step=25)
+scoresKNN = dict()
 
 for cv in CV:
-    print('Con CV =', cv, 'y neighbours =', neighbours)
-    #scores = knn(X = X_1D_norm, Y = t_num, n_neighbours = neighbours, cv = cv)
-    #scoresKNN.append(scores)
+    for neighbour in neighbours:
+        print('Con CV =', cv, 'y neighbours =', neighbours)
+        scoresKNN['KNN_CV' + str(cv) + '_neighbours' + str(neighbour)] = knn(X = X_1D_reduced, Y = t_num, n_neighbours = neighbour, cv = cv)
 
+# Imprimir graficas
+for metric in ['accuracy','roc_auc_ovo','f1_macro', 'precision_macro', 'recall_macro']:
+    cajas(scoresLR, metric, 'KNN-' + str(metric))
 
 # Entrenamiento Keras
 print("Iniciando entrenamiento red convolucional con keras")
@@ -68,14 +85,12 @@ batch = 20
 epochs = 5
 conNeurons = np.array([8, 16, 16])
 denseNeurons = np.array([64, 4])
-scoresDL = []
+scoresDL = dict()
 
 for cv in CV:
     print('Con CV =', cv, ', conNeurons =', conNeurons, 'y denseNeurons =', denseNeurons)
-    scores = conv(X = X_3Dnorm, Y = t_num, cv = cv, conNeurons = conNeurons, denseNeurons = denseNeurons, ler = ler,  batch = batch, epochs = epochs, resolucion = resolucion)
-    scoresDL.append(scores)
+    scoresDL['DL_CV' + str(cv)] = conv(X = X_3Dnorm, Y = t_num, cv = cv, conNeurons = conNeurons, denseNeurons = denseNeurons, ler = ler,  batch = batch, epochs = epochs, resolucion = resolucion)
 
-print(scoresDL)
 
 # Se realiza las comparativas de los principales parametros de las tecnicas evaluadas
 #comparativa_tecnicas(scoresLR, scoresLDA, scoresKNN, scoresDL)

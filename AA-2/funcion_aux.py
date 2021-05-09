@@ -2,15 +2,20 @@ import matplotlib.pyplot as plt
 import pandas as pd
 from pandas import ExcelWriter
 
-
 # Diagrama de cajas
-def boxPlot(L_modelos,L_titulos,title):
-    data = L_modelos
-    fig7, ax = plt.subplots()
+def cajas(scores, score, title):
+    keys = []
+    data = []
+    # Recuperar los datos
+    for key, value in scores.items():
+        keys.append(key)
+        data.append(value[score])
+
+    _, ax = plt.subplots()
     ax.set_title(title)
-    ax.boxplot(data,labels=L_titulos)
-    plt.xticks(rotation=90)
-    plt.show(block=True)
+    ax.boxplot(data,labels = keys)
+    plt.xticks(rotation = 90)
+    plt.show(block = True)
     
 #to_excel
 def saveToExcel(df, file, sheet, headers):
@@ -24,29 +29,6 @@ def saveDictToExcel(dic, file, sheet, headers):
 
     # Finalmente gravamos a disco
     saveToExcel(df = df, file = file, sheet = sheet, headers = headers)
-
-# Imprime los diagramas de cajas para todos los escenarios
-def imprimirEscenarios(scores, newScores, metrics):
-
-    # Vector con las métricas de cada escenario
-    lN_new=['Original']
-    l_new = dict()
-
-    for metric in metrics:
-        l_new[metric] = [scores[metric]]
-    
-
-    # Cargas las métricas
-    for key, value in newScores.items():
-        lN_new.append(key)
-        for metric in metrics:
-            l_new[metric].append(newScores[key][metric])
-
-
-    # Diagrama de cajas
-    for metric in metrics:
-        boxPlot(l_new[metric],lN_new,'Modelos ' + str(metric))
-
 
 # Guarda datos en hoja de Excel evitando que se borre lo que ya existe
 def saveHyperparametersScenariosDF(scores, newScores, file, headers):

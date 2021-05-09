@@ -13,7 +13,7 @@ from sklearn import metrics
 from keras import backend as K
 import pandas as pd
 import numpy as np
-from division_datos import K_fold_estratificada
+from division_datos import K_fold_estratificada, categorizar_datos
 
 # MODELOS APRENDIZAJE AUTOMÁTICO
 # LogisticRegression
@@ -142,8 +142,7 @@ def conv(X, Y, cv, conNeurons, denseNeurons, ler, batch, epochs, resolucion):
         # Se crea el modelo
         modelDL = crea_modelo(conNeurons, denseNeurons, ler, resolucion)
         # Se categorizan las clases de salida
-        n_classes =  len(np.unique(Y))
-        Y_cat = keras.utils.to_categorical(Y, num_classes=n_classes)
+        Y_cat = categorizar_datos(Y)
         # Se obtienen los paquetes de datos de entrenamiento y test en base a los índices aleatorios generados en la k-fold
         X_train, Y_train = X[train_index[k_fold]], Y_cat[train_index[k_fold]]
         X_test, Y_test = X[test_index[k_fold]], Y_cat[test_index[k_fold]]
