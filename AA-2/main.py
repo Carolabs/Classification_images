@@ -27,7 +27,7 @@ X_1D_norm, X_3Dnorm = normalizar_entradas(dato_entrada)
 # Reduccion de la dimensionalidad para entrenar las regresiones del sklearn
 # Se pasan de 12288 elementos a 50
 print("Iniciando reduccion de la dimensionalidad con PCA")
-n_components = 50
+n_components = 50 # Como escogemos este valor???
 PCA, X_1D_reduced = pca(X = X_1D_norm, n_components = n_components)
 plt.bar(np.arange(1, len(PCA.explained_variance_ratio_) + 1), PCA.explained_variance_ratio_ * 100)
 plt.show(block=True)
@@ -39,10 +39,10 @@ inercias = []
 
 for n_cluster in range(1, n_clusters + 1):
     print('Con', n_cluster,'clusters')
-    kmeans = km(X = X_1D_norm, clusters = n_cluster)
+    kmeans = km(X = X_1D_norm, clusters = n_cluster) # Se hace con la X original o X reducida con PCA???
     inercias.append(kmeans.inertia_)
 
-_ = plt.plot(np.arange(1, len(inercias) + 1), inercias)
+_ = plt.plot(np.arange(1, len(inercias) + 1), inercias) # Como seleccionamos el numero optimo cuando no hay un codo claro
 plt.ylabel("Inercia")
 plt.xlabel("Clusters")
 plt.show(block=True)
@@ -100,10 +100,15 @@ epochs = 5
 conNeurons = np.array([[8, 16, 16], [16, 16, 16], [16, 32, 32]])
 denseNeurons = np.array([[32, 4], [64, 4], [128, 4]])
 scoresDL = dict()
-
+red = 0
+ 
 for cv in CV:
-    print('Con CV =', cv, ', conNeurons =', conNeurons, 'y denseNeurons =', denseNeurons)
-    #scoresDL['DL_CV' + str(cv)] = conv(X = X_3Dnorm, Y = t_num, cv = cv, conNeurons = conNeurons, denseNeurons = denseNeurons, ler = ler,  batch = batch, epochs = epochs, resolucion = resolucion)
+    for convolucion in conNeurons:
+        for densa in denseNeurons:
+            print('Con CV =', cv, ', conNeurons =', conNeurons, 'y denseNeurons =', denseNeurons)
+            scoresDL['DL_CV' + str(cv) + '_Conv' + str(red)] = conv(X = X_3Dnorm, Y = t_num, cv = cv, conNeurons = convolucion, denseNeurons = densa, ler = ler,  batch = batch, epochs = epochs, resolucion = resolucion)
+            red += 1
+
 
 # Grabar a Excel los datos obtenidos para cada tecnica y con la variacion de hiperparametros estudiada
 saveToExcel(scoresLR, 'scoresLR.xlsx')
