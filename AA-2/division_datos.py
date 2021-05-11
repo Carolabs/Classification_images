@@ -16,7 +16,7 @@ def categorizar_datos(Y):
 def K_fold_estratificada(X, Y, k_folds):
     
     # Se genera una K-fold estratificada
-    rkf = StratifiedKFold(n_splits = k_folds, random_state = 42)
+    rkf = StratifiedKFold(n_splits = k_folds)
 
     train=[]
     test=[]
