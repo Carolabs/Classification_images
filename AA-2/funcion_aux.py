@@ -1,5 +1,4 @@
 import matplotlib.pyplot as plt
-import pandas as pd
 from pandas import ExcelWriter
 
 # Diagrama de cajas
@@ -17,6 +16,18 @@ def cajas(scores, score, title):
     plt.xticks(rotation = 90)
     plt.show(block = True)
 
+# Plot epochs
+def historial(history, name):
+    plt.figure(figsize=(12,5))
+    plt.plot(history.history['accuracy'], label='Train')
+    plt.plot(history.history['val_accuracy'], label = 'Test')
+    plt.xlabel('Epoch number')
+    plt.ylabel('Accuracy')
+    plt.ylim([0, 1])
+    plt.grid()
+    plt.title('Modelo ' + str(name))
+    plt.legend(loc='lower right')
+    plt.show(block = True)
 
 # to_excel
 def saveToExcel(scores, file):
@@ -26,3 +37,4 @@ def saveToExcel(scores, file):
         value.to_excel(excel_writer = writer, sheet_name = key, engine = 'xlsxwriter', columns = ['accuracy','roc_auc_ovo','f1_macro', 'precision_macro', 'recall_macro'])
     
     writer.save()
+

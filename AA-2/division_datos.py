@@ -18,11 +18,11 @@ def K_fold_estratificada(X, Y, k_folds):
     # Se genera una K-fold estratificada
     rkf = StratifiedKFold(n_splits = k_folds)
 
-    train=[]
-    test=[]
+    train = []
+    test = []
 
     # Se realizan tantos entrenamientos como valor de se indica en la validación cruzada
-    for i, (train_index, test_index) in enumerate(rkf.split(X, Y)):
+    for _, (train_index, test_index) in enumerate(rkf.split(X, Y)):
         # Paso de la k-fold al vector de salida
         train.append(train_index)
         test.append(test_index)

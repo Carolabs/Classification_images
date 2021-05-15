@@ -1,5 +1,4 @@
-from sklearn.linear_model import LogisticRegression
-from sklearn.discriminant_analysis import LinearDiscriminantAnalysis
+from sklearn.tree import DecisionTreeClassifier
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.cluster import KMeans
@@ -7,69 +6,87 @@ from sklearn.neighbors import NearestNeighbors
 from sklearn.cluster import DBSCAN
 from sklearn.decomposition import PCA
 from sklearn.decomposition import FastICA
+from sklearn.tree import DecisionTreeClassifier
 from sklearn.model_selection import cross_validate
 from tensorflow import keras
 from tensorflow.keras import layers
 from sklearn import metrics
 from keras import backend as K
 import pandas as pd
+from funcion_aux import historial
 from division_datos import K_fold_estratificada, categorizar_datos
 
 # MODELOS APRENDIZAJE AUTOMÁTICO
-# LogisticRegression
-# multiclass problems, only ‘newton-cg’, ‘sag’, ‘saga’ and ‘lbfgs’ handle multinomial loss; ‘liblinear’ is limited to one-versus-rest schemes.
-# multi_class{‘auto’, ‘ovr’, ‘multinomial’}, default=’auto’
-# If the option chosen is ‘ovr’, then a binary problem is fit for each label. For ‘multinomial’ the loss minimised is the multinomial loss fit across the entire probability distribution, even when the data is binary. ‘multinomial’ is unavailable when solver=’liblinear’. ‘auto’ selects ‘ovr’ if the data is binary, or if solver=’liblinear’, and otherwise selects ‘multinomial’.
-# roc_auc_ovo--> one vs one devuelve el area bajo la curva roc
-# Compute Area Under the Receiver Operating Characteristic Curve (ROC AUC) from prediction scores.
-# Note: this implementation can be used with binary, multiclass and multilabel classification, but some restrictions apply (see Parameters).
-
-def lr(X, Y, max_Ite, cv):
+def dtc(X, Y, samples_split, samples_leaf, cv):
 
     # Se crea el score
-    scoresLR = pd.DataFrame(columns = ['accuracy','roc_auc_ovo','f1_macro', 'precision_macro', 'recall_macro'])
+    scoresDTC = pd.DataFrame(columns = ['accuracy','roc_auc_ovo','f1_macro', 'precision_macro', 'recall_macro'])
     
     # Para cada set se entrena el modelo y se calculan sus scores
     # Se usa una k-fold estratificada metiendo en el cross_validate un cv, o metiendo los sets de datos
-    modelLR = LogisticRegression(penalty='none', solver = 'lbfgs', max_iter=max_Ite, multi_class='auto')
-    scoresLR = cross_validate(estimator = modelLR, X = X, cv = cv, y = Y, scoring = ['accuracy','roc_auc_ovo','f1_macro', 'precision_macro', 'recall_macro'])
+    train, test = K_fold_estratificada(X = X, Y = Y, k_folds = cv)
+
+    for split in range(0, cv):
+        # Introduce como vector Y, un vector que va de 0 a 3
+        modelDTC = DecisionTreeClassifier(min_samples_split = samples_split, min_samples_leaf = samples_leaf).fit(X = X[train[split]], y = Y[train[split]])
+        Y_pred = modelDTC.predict(X[test[split]])
+        Y_pred_proba = modelDTC.predict_proba(X[test[split]])
+
+        # Guarda las metricas
+        scoresDTC.loc[split + 1] = [metrics.accuracy_score(Y[test[split]], Y_pred),
+                                    metrics.roc_auc_score(Y[test[split]], Y_pred_proba, average='macro', multi_class = 'ovo'),
+                                    metrics.f1_score(Y[test[split]], Y_pred, average='macro'),
+                                    metrics.precision_score(Y[test[split]], Y_pred, average='macro', zero_division = 0),
+                                    metrics.recall_score(Y[test[split]], Y_pred, average='macro')]
     
-    return scoresLR
-
-def lda(X, Y, cv):
-
-    # Se crea el score
-    scoresLDA = pd.DataFrame(columns=['accuracy','roc_auc_ovo','f1_macro', 'precision_macro', 'recall_macro'])
-    
-    # Para cada set se entrena el modelo y se calculan sus scores
-    # Se usa una k-fold estratificada metiendo en el cross_validate un cv, o metiendo los sets de datos
-    modelLDA = LinearDiscriminantAnalysis()
-    scoresLDA = cross_validate(estimator = modelLDA, X = X, cv = cv, y = Y, scoring = ['accuracy','roc_auc_ovo','f1_macro', 'precision_macro', 'recall_macro'])
-
-    return scoresLDA
+    return scoresDTC
 
 def knn(X, Y, neighbours, cv):
 
     # Se crea el score
-    scoresKNN = pd.DataFrame(columns=['accuracy','roc_auc_ovo','f1_macro', 'precision_macro', 'recall_macro'])
+    scoresKNN = pd.DataFrame(columns = ['accuracy','roc_auc_ovo','f1_macro', 'precision_macro', 'recall_macro'])
     
     # Para cada set se entrena el modelo y se calculan sus scores
     # Se usa una k-fold estratificada metiendo en el cross_validate un cv, o metiendo los sets de datos
-    modelKNN = KNeighborsClassifier(n_neighbors = neighbours)
-    scoresKNN = cross_validate(estimator = modelKNN, X = X, cv = cv, y = Y, scoring = ['accuracy','roc_auc_ovo','f1_macro', 'precision_macro', 'recall_macro'])
+    train, test = K_fold_estratificada(X = X, Y = Y, k_folds = cv)
 
+    for split in range(0, cv):
+        # Introduce como vector Y, un vector que va de 0 a 3
+        modelKNN = KNeighborsClassifier(n_neighbors = neighbours).fit(X = X[train[split]], y = Y[train[split]])
+        Y_pred = modelKNN.predict(X[test[split]])
+        Y_pred_proba = modelKNN.predict_proba(X[test[split]])
+
+        # Guarda las metricas
+        scoresKNN.loc[split + 1] = [metrics.accuracy_score(Y[test[split]], Y_pred),
+                                    metrics.roc_auc_score(Y[test[split]], Y_pred_proba, average='macro', multi_class = 'ovo'),
+                                    metrics.f1_score(Y[test[split]], Y_pred, average='macro'),
+                                    metrics.precision_score(Y[test[split]], Y_pred, average='macro', zero_division = 0),
+                                    metrics.recall_score(Y[test[split]], Y_pred, average='macro')]
+    
     return scoresKNN
 
-def rf(X, Y, cv, trees):
+def rf(X, Y, trees, cv):
 
     # Se crea el score
-    scoresRF = pd.DataFrame(columns=['accuracy','roc_auc_ovo','f1_macro', 'precision_macro', 'recall_macro'])
+    scoresRF = pd.DataFrame(columns = ['accuracy','roc_auc_ovo','f1_macro', 'precision_macro', 'recall_macro'])
     
     # Para cada set se entrena el modelo y se calculan sus scores
     # Se usa una k-fold estratificada metiendo en el cross_validate un cv, o metiendo los sets de datos
-    modelRF = RandomForestClassifier(n_estimators = trees)
-    scoresRF = cross_validate(estimator = modelRF, X = X, cv = cv, y = Y, scoring = ['accuracy','roc_auc_ovo','f1_macro', 'precision_macro', 'recall_macro'])
+    train, test = K_fold_estratificada(X = X, Y = Y, k_folds = cv)
 
+    for split in range(0, cv):
+        # Introduce como vector Y, un vector que va de 0 a 3
+        modelRF = RandomForestClassifier(n_estimators = trees).fit(X = X[train[split]], y = Y[train[split]])
+        Y_pred = modelRF.predict(X[test[split]])
+        Y_pred_proba = modelRF.predict_proba(X[test[split]])
+
+        # Guarda las metricas
+        scoresRF.loc[split + 1] = [metrics.accuracy_score(Y[test[split]], Y_pred),
+                                    metrics.roc_auc_score(Y[test[split]], Y_pred_proba, average='macro', multi_class = 'ovo'),
+                                    metrics.f1_score(Y[test[split]], Y_pred, average='macro'),
+                                    metrics.precision_score(Y[test[split]], Y_pred, average='macro', zero_division = 0),
+                                    metrics.recall_score(Y[test[split]], Y_pred, average='macro')]
+    
     return scoresRF
 
 def km(X, clusters):
@@ -111,7 +128,8 @@ def conv(X, Y, cv, conNeurons, denseNeurons, ler, batch, epochs, resolucion):
         X_train, Y_train = X[train_index[k_fold]], Y_cat[train_index[k_fold]]
         X_test, Y_test = X[test_index[k_fold]], Y_cat[test_index[k_fold]]
         # Se realiza el entrenamiento de la red de neuronas
-        modelDL.fit(X_train, Y_train, validation_data=(X_test, Y_test), epochs=epochs, batch_size=batch, verbose=True)
+        historiaDL = modelDL.fit(X_train, Y_train, validation_data=(X_test, Y_test), epochs=epochs, batch_size=batch, verbose=True)
+        historial(historiaDL, 'DL_CV' + str(k_fold) + '_Conv' + str(conNeurons) + '_Dense' + str(denseNeurons))
         scoresDL.loc[k_fold + 1] = modelDL.evaluate(X_test, Y_test, batch_size=None)[1:]  # Se descarta la métrica 0 porque es el valor de la función de error
 
     return scoresDL
