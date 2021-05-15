@@ -126,5 +126,5 @@ saveToExcel(scoresDL, 'scoresDL.xlsx')
 opcionDTC = 'DTC_CV5_splits3_leafs3'
 opcionKNN = 'KNN_CV5_neigh100'
 opcionRF = 'RF_CV5_trees80'
-opcionDL = 'DL_CV5_Red8'
+opcionDL = 'DL_CV5_Conv8'
 contraste(accuracy1 = scoresDTC[opcionDTC]['accuracy'], accuracy2 = scoresKNN[opcionKNN]['accuracy'], accuracy3 = scoresRF[opcionRF]['accuracy'], accuracy4 = scoresDL[opcionDL]['accuracy'], alpha = 0.1)
