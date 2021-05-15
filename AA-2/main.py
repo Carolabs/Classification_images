@@ -88,7 +88,7 @@ scoresKNN = dict()
 for cv in CV:
     for neighbour in neighbours:
         print('Con CV =', cv, 'y neighbours =', neighbour)
-        scoresKNN['KNN_CV' + str(cv) + '_neighbours' + str(neighbour)] = knn(X = X_1D_reduced, Y = t_num, neighbours = neighbour, cv = cv)
+        scoresKNN['KNN_CV' + str(cv) + '_neigh' + str(neighbour)] = knn(X = X_1D_reduced, Y = t_num, neighbours = neighbour, cv = cv)
 
 # Imprimir graficas
 for metric in ['accuracy','roc_auc_ovo','f1_macro', 'precision_macro', 'recall_macro']:

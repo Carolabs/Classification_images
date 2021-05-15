@@ -129,7 +129,7 @@ def conv(X, Y, cv, conNeurons, denseNeurons, ler, batch, epochs, resolucion):
         X_test, Y_test = X[test_index[k_fold]], Y_cat[test_index[k_fold]]
         # Se realiza el entrenamiento de la red de neuronas
         historiaDL = modelDL.fit(X_train, Y_train, validation_data=(X_test, Y_test), epochs=epochs, batch_size=batch, verbose=True)
-        historial(historiaDL, 'DL_CV' + str(k_fold) + '_Conv' + str(conNeurons) + '_Dense' + str(denseNeurons))
+        historial(historiaDL, 'DL_CV' + str(k_fold + 1) + '_Conv' + str(conNeurons) + '_Dense' + str(denseNeurons))
         scoresDL.loc[k_fold + 1] = modelDL.evaluate(X_test, Y_test, batch_size=None)[1:]  # Se descarta la métrica 0 porque es el valor de la función de error
 
     return scoresDL
